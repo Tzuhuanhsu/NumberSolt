@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package mallProto;
+
+message MallReq {
+    int32 apiID = 1;
+    int32 accountID = 2;
+    string lang = 3;
+}

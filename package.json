@@ -1,0 +1,12 @@
+{
+  "name": "NumberSolt",
+  "uuid": "1b9f54d5-0970-4bb4-a1a6-a9039d54458a",
+  "version": "3.0.0",
+  "_sourceId": "c30b28da-749e-479b-bcb6-cecd8d7be9e3",
+  "creator": {
+    "version": "3.7.2"
+  },
+  "dependencies": {
+    "protobufjs": "^7.2.6"
+  }
+}

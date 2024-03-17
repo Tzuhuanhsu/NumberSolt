@@ -1,0 +1,9 @@
+
+ {
+    "HotBundle":"hotScene",
+    "HotScene":"hotScene",
+    "GameBundles":["script", "scene","prefab"],
+    "GameBundle":"scene",
+    "GameScene":"main",
+    "Environment":"test"
+ }
