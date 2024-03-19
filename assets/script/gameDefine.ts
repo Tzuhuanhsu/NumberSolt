@@ -1,6 +1,8 @@
-export class gameDefine
+
+
+export namespace gameDefine
 {
-    public static symbols = [
+    export const symbols = [
         "1",
         "1",
         "1",
@@ -10,5 +12,5 @@ export class gameDefine
         "3",
         "3",
         "3",
-    ];
+    ]
 }
