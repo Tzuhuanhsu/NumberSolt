@@ -5,6 +5,6 @@
     "GameBundles":["script", "scene","prefab"],
     "GameBundle":"scene",
     "GameScene":"main",
-    "Environment":"develop",
+    "Environment":"test",
     "Ver":"1.0.0"
  }
