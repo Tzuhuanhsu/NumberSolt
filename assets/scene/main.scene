@@ -2367,7 +2367,7 @@
     "_enabled": true,
     "__prefab": null,
     "symbolInterval": 100,
-    "symbolMoveLength": 100,
+    "symbolMoveLengthLimit": 100,
     "spinEndTime": 2,
     "spinMaxSpeed": 15,
     "reelMask": [
