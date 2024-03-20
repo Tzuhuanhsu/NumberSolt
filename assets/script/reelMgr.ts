@@ -28,7 +28,7 @@ enum SPIN_STATE
 export class reelMgr extends cc.Component
 {
     @property(cc.CCInteger) symbolInterval: number = 0;
-    @property(cc.CCInteger) symbolMoveLength: number = 0;
+    @property(cc.CCInteger) symbolMoveLengthLimit: number = 0;
     @property(cc.CCInteger) spinEndTime: number = 0;
     @property(cc.CCInteger) spinMaxSpeed: number = 0;
     @property([cc.Node]) reelMask: cc.Node[] = new Array<cc.Node>();
@@ -56,6 +56,7 @@ export class reelMgr extends cc.Component
                 this.symbols[row].push(symbolNode.getComponent(symbolComp));
             }
         }
+        this.symbolMoveLengthLimit = Math.abs(this.symbolMoveLengthLimit);
         this.initFSMState();
 
     }
@@ -123,32 +124,64 @@ export class reelMgr extends cc.Component
     //spin process
     private onSpin(dt: number)
     {
+
         this.spinTime += dt;
         this.spinBeginSpeed = this.spinBeginSpeed > this.spinMaxSpeed ? this.spinMaxSpeed : this.spinBeginSpeed += dt;
-        for (let row = 0; row < this.symbols.length; row++)
-        {
-            for (let col = 0; col < this.symbols[row].length; col++)
-            {
-                let deltaPosition = cc.v3(0, -(this.spinTime * this.spinBeginSpeed), 0);
-                let targetPos = new cc.Vec3();
-                cc.Vec3.add(targetPos, this.symbols[row][col].node.position, deltaPosition);
-
-                if (this.symbols[row][col].node.position.y < -this.symbolMoveLength)
-                {
-                    //表示該symbol已經移動到不可以看到的區域了
-                    targetPos.y = this.symbols[row][col].node.position.y % this.symbolMoveLength;
-                    this.symbols[row][col].onChangeContent();
-                    this.symbolChangeFlag = true;
-                }
-
-                this.symbols[row][col].node.setPosition(targetPos);
-            }
-        }
-        this.refreshSymbol();
         if (this.spinTime >= this.spinEndTime)
         {
             //停止轉輪
             this.spinState.NextState = SPIN_STATE.STOP;
+        }
+        this.spinReel();
+        this.refreshSymbol();
+    }
+
+
+    //stop spin process
+    private onStopSpin(dt: number)
+    {
+        //stop spin speed
+        const STOP_SPIN_SPEED = 1;
+        const STOP_SPIN_TIME = 1;
+        this.spinTime = this.spinTime <= STOP_SPIN_TIME ? STOP_SPIN_TIME : this.spinTime -= dt;
+        this.spinBeginSpeed = this.spinBeginSpeed <= STOP_SPIN_SPEED ?
+            STOP_SPIN_SPEED : this.spinBeginSpeed -= (dt * REEL_BEGIN_SPEED);
+
+        this.spinReel(this.spinTime == STOP_SPIN_TIME && this.spinBeginSpeed == STOP_SPIN_SPEED);
+        this.refreshSymbol();
+    }
+
+    //轉動轉輪
+    private spinReel(isStop: boolean = false)
+    {
+        const lerpRatio = 0.1;
+        for (let x = 0; x < this.symbols.length; x++)
+        {
+            for (let y = 0; y < this.symbols[x].length; y++)
+            {
+                let deltaPosition = cc.v3(0, -(this.spinTime * this.spinBeginSpeed), 0);
+                let targetPos = new cc.Vec3();
+                cc.Vec3.add(targetPos, this.symbols[x][y].node.position, deltaPosition);
+                if (isStop)
+                {
+                    //透過平滑曲線讓轉輪做最後停輪的表演
+                    targetPos.y = -cc.math.lerp(this.symbols[x][y].getMoveLength(), this.symbolMoveLengthLimit, lerpRatio);
+                    if (Math.ceil(this.symbols[x][y].getMoveLength()) >= this.symbolMoveLengthLimit)
+                    {
+                        this.spinState.NextState = SPIN_STATE.CHECK_AWARD;
+                    }
+                }
+                else if (this.symbols[x][y].getMoveLength() > this.symbolMoveLengthLimit)
+                {
+
+                    targetPos.y = -(this.symbols[x][y].getMoveLength() % this.symbolMoveLengthLimit);
+                    this.symbols[x][y].onChangeContent();
+                    this.symbolChangeFlag = true;
+
+                }
+
+                this.symbols[x][y].node.setPosition(targetPos);
+            }
         }
     }
 
@@ -162,42 +195,6 @@ export class reelMgr extends cc.Component
             this.symbolChangeFlag = false;
         }
     }
-    //stop spin process
-    private onStopSpin(dt: number)
-    {
-        //stop spin speed
-        const STOP_SPIN_SPEED = 1;
-        const STOP_SPIN_TIME = 1;
-        this.spinTime = this.spinTime <= STOP_SPIN_TIME ? STOP_SPIN_TIME : this.spinTime -= dt;
-        this.spinBeginSpeed = this.spinBeginSpeed <= STOP_SPIN_SPEED ?
-            STOP_SPIN_SPEED : this.spinBeginSpeed -= (dt * REEL_BEGIN_SPEED);
-        if (this.spinTime == STOP_SPIN_TIME && this.spinBeginSpeed == STOP_SPIN_SPEED)
-        {
-            this.spinState.NextState = SPIN_STATE.CHECK_AWARD;
-        }
-        for (let x = 0; x < this.symbols.length; x++)
-        {
-            for (let y = 0; y < this.symbols[x].length; y++)
-            {
-                let deltaPosition = cc.v3(0, -(this.spinTime * this.spinBeginSpeed), 0);
-                let targetPos = new cc.Vec3();
-                cc.Vec3.add(targetPos, this.symbols[x][y].node.position, deltaPosition);
-
-                if (this.symbols[x][y].node.position.y < -this.symbolMoveLength)
-                {
-
-                    targetPos.y = this.symbols[x][y].node.position.y % this.symbolMoveLength;
-                    this.symbols[x][y].onChangeContent();
-                    this.symbolChangeFlag = true;
-
-                }
-
-                this.symbols[x][y].node.setPosition(targetPos);
-            }
-        }
-        this.refreshSymbol();
-    }
-
     //spin結束
     private onSpinEnd(dt: number)
     {

@@ -68,4 +68,9 @@ export class symbolComp extends cc.Component
         this.preLabel.string = tempLabelContent;
     }
 
+    getMoveLength(): number
+    {
+        return Math.abs(this.node.position.y);
+    }
+
 }
