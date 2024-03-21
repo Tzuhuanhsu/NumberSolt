@@ -2,9 +2,9 @@
  {
     "HotBundle":"hotScene",
     "HotScene":"hotScene",
-    "GameBundles":["script", "scene","prefab"],
-    "GameBundle":"scene",
-    "GameScene":"main",
+    "GameBundles":["mainScrip", "gameScene","prefab"],
+    "GameBundle":"gameScene",
+    "GameScene":"gameScene",
     "Environment":"test",
     "Ver":"1.0.0"
  }
