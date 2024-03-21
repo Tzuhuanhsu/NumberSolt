@@ -1,0 +1,3 @@
+[submodule "extensions/CocosInspector"]
+	path = extensions/CocosInspector
+	url = https://github.com/Tzuhuanhsu/CocosInspector
