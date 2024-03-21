@@ -1,0 +1,3 @@
+[submodule "CocosInspector"]
+	path = CocosInspector
+	url = https://github.com/Tzuhuanhsu/CocosInspector
