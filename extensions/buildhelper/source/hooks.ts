@@ -1,24 +1,19 @@
 import { IBuildTaskOption, BuildHook, IBuildResult } from '../@types';
-import pathTool from "path";
+import pathModule from "path";
+import fsModule from "fs";
+import path from 'path';
 interface IOptions
 {
-    remoteAddress: string;
-    enterCocos: string;
-    selectTest: string;
-    objectTest: {
-        number: number;
-        string: string;
-        boolean: boolean
-    },
-    arrayTest: [number, string, boolean];
 }
 
 const PACKAGE_NAME = 'buildhelper';
+const EXPORT_FILE = "exportSummary";
+const EXPORT_PATH = "assets";
 
 interface ITaskOptions extends IBuildTaskOption
 {
     packages: {
-        'cocos-plugin-template': IOptions;
+        //'cocos-plugin-template': IOptions;
     };
 }
 
@@ -58,21 +53,8 @@ export const onAfterCompressSettings: BuildHook.onAfterCompressSettings = async 
 
 export const onAfterBuild: BuildHook.onAfterBuild = async function (options: ITaskOptions, result: IBuildResult)
 {
-    console.log("onAfterBuild", result.paths.settings);
-    // change the uuid to test
-    const uuidTestMap = {
-        image: '57520716-48c8-4a19-8acf-41c9f8777fb0',
-    };
-    for (const name of Object.keys(uuidTestMap))
-    {
-        const uuid = uuidTestMap[name];
-        console.debug(`containsAsset of ${name}`, result.containsAsset(uuid));
-        console.debug(`getAssetPathInfo of ${name}`, result.getAssetPathInfo(uuid));
-        console.debug(`getRawAssetPaths of ${name}`, result.getRawAssetPaths(uuid));
-        console.debug(`getJsonPathInfo of ${name}`, result.getJsonPathInfo(uuid));
-    }
-    // test onError hook
-    // throw new Error('Test onError');
+    console.log("On onAfterBuild Process");
+    writeBundleSetting(result.paths.settings, getExportFile(result.dest));
 };
 
 export const unload: BuildHook.unload = async function ()
@@ -95,3 +77,18 @@ export const onAfterMake: BuildHook.onAfterMake = async function (root, options)
 {
     console.log(`onAfterMake: root: ${root}, options: ${options}`);
 };
+
+//取得輸出位置
+function getExportFile(dest: string)
+{
+    console.log("export Path=", pathModule.join(dest, EXPORT_PATH, EXPORT_FILE));
+    return pathModule.join(dest, EXPORT_PATH, EXPORT_FILE);
+}
+
+//設定輸出內容
+function writeBundleSetting(settings: string, exportPath: string)
+{
+    const utf8BundleSetting = fsModule.readFileSync(settings).toString('utf-8');
+    const jsonBundleSetting = JSON.parse(utf8BundleSetting);
+    fsModule.writeFileSync(exportPath, JSON.stringify(jsonBundleSetting.assets.bundleVers));
+}

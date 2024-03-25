@@ -8,9 +8,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.onAfterMake = exports.onBeforeMake = exports.onError = exports.unload = exports.onAfterBuild = exports.onAfterCompressSettings = exports.onBeforeCompressSettings = exports.onBeforeBuild = exports.load = exports.throwError = void 0;
+const path_1 = __importDefault(require("path"));
+const fs_1 = __importDefault(require("fs"));
 const PACKAGE_NAME = 'buildhelper';
+const EXPORT_FILE = "exportSummary";
+const EXPORT_PATH = "assets";
 function log(...arg) {
     return console.log(`[${PACKAGE_NAME}] `, ...arg);
 }
@@ -47,20 +54,8 @@ const onAfterCompressSettings = function (options, result) {
 exports.onAfterCompressSettings = onAfterCompressSettings;
 const onAfterBuild = function (options, result) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log("onAfterBuild", result.paths.settings);
-        // change the uuid to test
-        const uuidTestMap = {
-            image: '57520716-48c8-4a19-8acf-41c9f8777fb0',
-        };
-        for (const name of Object.keys(uuidTestMap)) {
-            const uuid = uuidTestMap[name];
-            console.debug(`containsAsset of ${name}`, result.containsAsset(uuid));
-            console.debug(`getAssetPathInfo of ${name}`, result.getAssetPathInfo(uuid));
-            console.debug(`getRawAssetPaths of ${name}`, result.getRawAssetPaths(uuid));
-            console.debug(`getJsonPathInfo of ${name}`, result.getJsonPathInfo(uuid));
-        }
-        // test onError hook
-        // throw new Error('Test onError');
+        console.log("On onAfterBuild Process");
+        writeBundleSetting(result.paths.settings, getExportFile(result.dest));
     });
 };
 exports.onAfterBuild = onAfterBuild;
@@ -89,3 +84,14 @@ const onAfterMake = function (root, options) {
     });
 };
 exports.onAfterMake = onAfterMake;
+//取得輸出位置
+function getExportFile(dest) {
+    console.log("export Path=", path_1.default.join(dest, EXPORT_PATH, EXPORT_FILE));
+    return path_1.default.join(dest, EXPORT_PATH, EXPORT_FILE);
+}
+//設定輸出內容
+function writeBundleSetting(settings, exportPath) {
+    const utf8BundleSetting = fs_1.default.readFileSync(settings).toString('utf-8');
+    const jsonBundleSetting = JSON.parse(utf8BundleSetting);
+    fs_1.default.writeFileSync(exportPath, JSON.stringify(jsonBundleSetting.assets.bundleVers));
+}
