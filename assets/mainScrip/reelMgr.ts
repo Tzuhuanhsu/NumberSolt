@@ -2,7 +2,7 @@ import * as cc from "cc";
 import { symbolComp } from "./symbolComp";
 import { gameDefine } from "./gameDefine";
 import StateMachine from "./util/stateMachine";
-import mallProto from "./proto/test.js";
+import gameData from "./proto/gameData.js";
 
 
 const { ccclass, property } = cc._decorator;
@@ -41,8 +41,8 @@ export class reelMgr extends cc.Component
     private symbolChangeFlag: boolean = false;
     start()
     {
+        console.log("gameData", new gameData.gameData.dataStrut())
 
-        console.log("PBClass", mallProto.mallProto.MallReq);
         for (let row = 0; row < this.reelMask.length; row++)
         {
             this.reelMask[row].removeAllChildren();

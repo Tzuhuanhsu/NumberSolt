@@ -6,7 +6,7 @@
     "GameBundle":"gameScene",
     "GameScene":"gameScene",
     "Environment":"test",
-    "Patch":true,
+    "Patch":false,
     "VerCode":"1.0.0",
     "Server":{
       "Mater":"http://127.0.0.1",

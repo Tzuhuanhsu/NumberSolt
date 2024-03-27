@@ -1,0 +1,1 @@
+pbjs -t static-module -w commonjs -o gameData.js gameData.proto && pbts -o gameData.d.ts gameData.js
