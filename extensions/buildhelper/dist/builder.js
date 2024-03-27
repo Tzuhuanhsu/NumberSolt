@@ -51,12 +51,19 @@ exports.configs = {
         options: {
             title: {
                 label: `i18n:${PACKAGE_NAME}.title`,
-                default: 'true',
+                default: true,
                 render: {
                     ui: 'ui-checkbox',
                     attributes: {
-                        readonly: 'true',
+                        readonly: true,
+                        value: true
                     },
+                },
+            },
+            description: {
+                label: `i18n:${PACKAGE_NAME}.toolDescription`,
+                render: {
+                    ui: 'ui-label',
                 },
             },
         },

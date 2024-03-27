@@ -8,12 +8,13 @@ const { ccclass, property } = _decorator;
 export class startScene extends Component
 {
     @property(cc.JsonAsset) configJson: cc.JsonAsset;
-
+    @property(cc.Label) VerCodeLabel: cc.Label;
     private isLoading: boolean = false;
     start()
     {
         console.log("Start Scene Running");
         config.getInstance().Config = this.configJson;
+        this.VerCodeLabel.string = config.getInstance().Config.VerCode;
     }
     //按鈕觸發事件
     async buttonClick()

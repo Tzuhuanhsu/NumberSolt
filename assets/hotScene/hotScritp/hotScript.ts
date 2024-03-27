@@ -3,29 +3,28 @@ import * as cc from "cc";
 import config from '../../startScene/startScript/config';
 import bundleHelp from '../../startScene/startScript/bundleHelp';
 const { ccclass, property } = _decorator;
-
 @ccclass('hotScript')
 export class hotScript extends Component
 {
     @property(Label) stateLabel: Label;
-
+    @property(Label) verCodeLabel: Label;
     start()
     {
         this.setState(`需要載入的Bundle = (0/${config.getInstance().Config.GameBundles.length})`);
+        this.verCodeLabel.string = config.getInstance().Config.VerCode;
     }
     setState(state: string)
     {
         this.stateLabel.string = state;
     }
-    onClick()
+    async onClick()
     {
-        this.loadNextBundle();
+        await this.loadNextBundle();
     }
-    private loadNextBundle()
+    private async loadNextBundle()
     {
         if (bundleHelp.getInstance().getGameBundleSize() == config.getInstance().Config.GameBundles.length)
         {
-            console.log("getGameBundleSize");
             bundleHelp.getInstance().getMainGameBundle().loadScene(config.getInstance().Config.GameScene, null, (err: Error, scene: cc.SceneAsset) =>
             {
                 if (err)
@@ -41,10 +40,18 @@ export class hotScript extends Component
 
             return;
         }
+        if (config.getInstance().Config.Patch == true)
+        {
+            bundleHelp.getInstance().loadLocalSummary();
+            await bundleHelp.getInstance().loadRemoteSummary();
+        }
+
         config.getInstance().Config.GameBundles.forEach(bundle =>
         {
-            console.log("Bundle", bundle);
-            bundleHelp.getInstance().loadBundle(bundle, null, (err: Error, data: cc.AssetManager.Bundle) =>
+            console.log("Bundle", bundle, bundleHelp.getInstance().getBundleMd5(bundle));
+            const options = { version: bundleHelp.getInstance().getBundleMd5(bundle) };
+            const bundlePath = bundleHelp.getInstance().getBundlePath(bundle);
+            bundleHelp.getInstance().loadBundle(bundlePath, options, (err: Error, data: cc.AssetManager.Bundle) =>
             {
                 if (err)
                 {
