@@ -10,8 +10,8 @@ export default class bundleHelp
     private static instance: bundleHelp = null;
     private constructor () { }
     private loadedBundle: Map<string, cc.AssetManager.Bundle> = new Map();
-    private bundleMd5 = {}
-    private remoteMd5 = {};
+    private bundleMd5: any = {}
+    private remoteMd5: any = {};
     static getInstance(): bundleHelp
     {
         if (this.instance == null)
@@ -38,8 +38,21 @@ export default class bundleHelp
     //載入本地端的summary
     loadLocalSummary()
     {
+        if (cc.sys.isNative == false)
+        {
+            this.bundleMd5 = {};
+            return;
+        }
         const storageMd5 = cc.sys.localStorage.getItem(BUNDLE_STORAGE_KEY);
-        this.bundleMd5 = JSON.parse(storageMd5);
+        this.bundleMd5 = JSON.parse(storageMd5) ?? {};
+        config.getInstance().Config.GameBundles.forEach(bundle =>
+        {
+            if (!this.bundleMd5[bundle])
+            {
+                this.bundleMd5[bundle] = "";
+            }
+
+        });
     }
     //載入遠端的summary
     async loadRemoteSummary()
@@ -91,6 +104,8 @@ export default class bundleHelp
         {
             if (!err)
             {
+                console.log("loadBundle url", nameOrUrl)
+                console.log("loadBundle options", options)
                 this.addGameBundleSize();
                 this.loadedBundle.set(bundle.name, bundle);
                 this.setStorageBundleVersion(bundle.name, options?.version);
@@ -103,14 +118,19 @@ export default class bundleHelp
     //取得 bundle的 版本號
     getBundleMd5(bundleName: string): string
     {
-        if (config.getInstance().Config.Patch == false || this.remoteMd5[bundleName] == this.bundleMd5[bundleName])
+        console.log("getBundleMd5 bundleName", bundleName, this.remoteMd5[bundleName], this.bundleMd5[bundleName]);
+        if (config.getInstance().Config.Patch == false)
         {
             return null;
         }
-        else (this.remoteMd5[bundleName] != this.bundleMd5[bundleName])
+        if (this.remoteMd5[bundleName] != this.bundleMd5[bundleName])
         {
             //遠地端，跟本地端的 Md5 不同，以遠端的 Md5 為主
             return this.remoteMd5[bundleName];
+        }
+        else
+        {
+            return this.bundleMd5[bundleName];
         }
 
     }
@@ -118,6 +138,7 @@ export default class bundleHelp
     //載入指定的 Bundle
     getBundlePath(bundleName: string)
     {
+        console.log("getBundlePath bundleName", bundleName, this.remoteMd5[bundleName], this.bundleMd5[bundleName]);
         if (this.remoteMd5[bundleName] == this.bundleMd5[bundleName] || config.getInstance().Config.Patch == false)
         {
             //遠端跟本地端的版本號相同 or 沒有開啟 Patch
