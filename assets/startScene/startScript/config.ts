@@ -8,11 +8,19 @@ export interface IConfig
     Environment: string
     GameBundle: string
     GameBundles: []
+    VerCode: string,
+    Server: {},
+    Patch: boolean
 }
-
+export const ServerName =
+{
+    Mater: "Mater",
+    Summary: "Summary",
+    Bundle: "Bundle"
+}
 export default class config
 {
-    private gameBundleSize: number = 0;
+    private gameVersion: string = "0.0.0";
     private static instance = null;
     private configData: IConfig;
     private constructor () { }
@@ -26,6 +34,15 @@ export default class config
         return this.instance;
     }
 
+    updateGameVersion(version: string)
+    {
+        this.gameVersion = version;
+    }
+
+    getGameVersion(): string
+    {
+        return this.gameVersion;
+    }
 
     set Config(config: cc.JsonAsset)
     {

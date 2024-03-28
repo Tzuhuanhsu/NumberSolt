@@ -6,5 +6,11 @@
     "GameBundle":"gameScene",
     "GameScene":"gameScene",
     "Environment":"test",
-    "Ver":"1.0.0"
+    "Patch":false,
+    "VerCode":"1.0.0",
+    "Server":{
+      "Mater":"http://127.0.0.1",
+      "Summary":"/patch/exportSummary",
+      "Bundle":"/patch/"
+    }
  }
